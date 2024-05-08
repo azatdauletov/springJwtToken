@@ -7,15 +7,21 @@ import kg.alima.SpringJwtToken.model.User;
 import kg.alima.SpringJwtToken.repository.UserRepository;
 import kg.alima.SpringJwtToken.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImp implements UserService {
     private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
     @Override
     public UserDto createUser(UserDto userDto) {
         User user = UserMapper.mapToUser(userDto);
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         User userSaved = repository.save(user);
         return UserMapper.mapToUserDto(userSaved);
     }
@@ -25,6 +31,13 @@ public class UserServiceImp implements UserService {
         User user = repository.findById(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("User not found with given id: " + userId));
         return UserMapper.mapToUserDto(user);
+    }
+
+    @Override
+    public List<UserDto> getAllUsers() {
+        List<User> users = repository.findAll();
+        return users.stream().map((user) -> UserMapper.mapToUserDto(user) )
+                .collect(Collectors.toList());
     }
 
 
