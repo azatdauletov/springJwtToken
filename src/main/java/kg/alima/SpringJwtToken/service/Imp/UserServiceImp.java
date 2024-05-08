@@ -53,5 +53,12 @@ public class UserServiceImp implements UserService {
         return UserMapper.mapToUserDto(updatedUserObj);
     }
 
+    @Override
+    public void deleteUserById(Long userId) {
+        User user = repository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User not found with given id: " + userId));
+        repository.deleteById(userId);
+    }
+
 
 }
