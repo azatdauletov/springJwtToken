@@ -40,5 +40,18 @@ public class UserServiceImp implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public UserDto updateUser(Long userId, UserDto updatedUser) {
+        User user = repository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User not found with given id: " + userId));
+        user.setFirstName(updatedUser.getFirstName());
+        user.setLastName(updatedUser.getLastName());
+        user.setUserName(updatedUser.getUserName());
+        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        user.setRole(updatedUser.getRole());
+        User updatedUserObj = repository.save(user);
+        return UserMapper.mapToUserDto(updatedUserObj);
+    }
+
 
 }
